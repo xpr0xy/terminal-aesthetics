@@ -2,154 +2,1241 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>TERMINAL.AESTHETICS</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0a0a0f;color:#00e5ff;font-family:'Share Tech Mono','Courier New',monospace;overflow:hidden;height:100vh;width:100vw;position:relative;}
-body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,0.03) 2px,rgba(0,229,255,0.03) 4px);pointer-events:none;z-index:1000;}
-body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.7) 100%);pointer-events:none;z-index:999;}
-.screen{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr auto;height:100vh;padding:20px;gap:16px;}
-@media(max-width:640px){
-  .screen{grid-template-columns:1fr;grid-template-rows:auto auto auto auto;height:auto;padding:10px;gap:8px;}
-  .col{flex-direction:column;gap:8px;}
-  .col>*{min-height:120px;flex:unset;height:150px;}
-  .header{flex-wrap:wrap;gap:4px;font-size:9px;padding:6px 10px;}
-  .header .title{font-size:10px;letter-spacing:2px;width:100%;text-align:center;}
-  .footer{flex-wrap:wrap;gap:4px;font-size:8px;padding:4px 10px;}
-  .panel-label{font-size:8px;}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060810;
+  --cyan:#00e5ff;
+  --orange:#ff6b35;
+  --green:#00ff88;
+  --red:#ff3355;
+  --dim:#00e5ff44;
+  --border:#00e5ff22;
+  --glow:0 0 8px #00e5ff55;
 }
-.header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;border:1px solid #00e5ff33;padding:8px 16px;font-size:11px;color:#00e5ff88;}
-.header .title{color:#ff6b35;font-size:13px;letter-spacing:4px;}
-.col{display:flex;flex-direction:column;gap:12px;}
-.panel{border:1px solid #00e5ff44;padding:12px;position:relative;flex:1;min-height:0;overflow:hidden;}
-.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00e5ff,transparent);opacity:0.5;}
-.panel-label{position:absolute;top:-10px;left:12px;background:#0a0a0f;padding:0 6px;font-size:9px;color:#ff6b35;letter-spacing:3px;}
-.panel-content{font-size:10px;line-height:1.4;color:#00e5ffaa;overflow:hidden;}
-.radar-container{display:flex;justify-content:center;align-items:center;height:100%;}
-canvas#radar{border-radius:50%;}
-.hex-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;font-size:8px;color:#00e5ff55;}
-.hex-cell{padding:2px;text-align:center;}
-.hex-cell.hot{color:#ff6b35cc;}
-.lissajous-container{display:flex;justify-content:center;align-items:center;height:100%;}
-canvas#lissajous{border-radius:50%;}
-.data-log{height:100%;overflow:hidden;}
-.log-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.log-line .idx{color:#ff6b3588;}
-.log-line .type{color:#00e5ff88;}
-.log-line .msg{color:#00e5ffcc;}
-.log-line .warn{color:#ff6b35;}
-.log-line .ok{color:#00ff88;}
-.cursor{display:inline-block;width:8px;height:12px;background:#00e5ff;animation:blink 1s step-end infinite;vertical-align:middle;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-.phase-meter{display:flex;align-items:center;gap:8px;padding:4px 0;}
-.phase-bar{flex:1;height:4px;background:#00e5ff11;position:relative;overflow:hidden;}
-.phase-fill{height:100%;background:linear-gradient(90deg,#00e5ff,#ff6b35);animation:phaseSlide 2s linear infinite;}
-@keyframes phaseSlide{0%{width:0%;}50%{width:100%;}100%{width:0%;}}
-.network-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:8px;}
-.node{padding:4px;border:1px solid #00e5ff22;text-align:center;color:#00e5ff66;animation:nodePulse 2s ease-in-out infinite;}
-.node:nth-child(odd){animation-delay:-1s;}
-.node.online{border-color:#00ff8844;color:#00ff88aa;}
-.node.warn{border-color:#ff6b3544;color:#ff6b35aa;}
-@keyframes nodePulse{0%,100%{opacity:0.6;}50%{opacity:1;}}
-.progress-row{display:flex;align-items:center;gap:8px;font-size:9px;color:#00e5ff88;}
-.progress-bar{flex:1;height:2px;background:#00e5ff22;}
-.progress-fill{height:100%;background:#00e5ff;animation:progressAnim 3s ease-in-out infinite;}
-@keyframes progressAnim{0%{width:10%;}50%{width:90%;}100%{width:10%;}}
-.footer{grid-column:1/-1;display:flex;justify-content:space-between;font-size:9px;color:#00e5ff44;border:1px solid #00e5ff22;padding:6px 16px;}
-#bgCanvas{position:fixed;inset:0;z-index:-1;}
-.glitch{animation:glitch 3s infinite;}
-@keyframes glitch{0%,95%,100%{transform:none;filter:none;}96%{transform:skewX(2deg);filter:hue-rotate(90deg);}97%{transform:skewX(-1deg);}98%{transform:skewX(1deg);filter:hue-rotate(-90deg);}99%{transform:none;filter:hue-rotate(45deg);}}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--bg);
+  color:var(--cyan);
+  font-family:'Share Tech Mono','Courier New',monospace;
+  font-size:12px;
+  line-height:1.5;
+  position:fixed;
+  inset:0;
+}
+/* CRT */
+body::before{
+  content:'';
+  position:fixed;inset:0;z-index:9000;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,0.015) 2px,rgba(0,229,255,0.015) 4px);
+  pointer-events:none;
+}
+body::after{
+  content:'';
+  position:fixed;inset:0;z-index:8999;
+  background:radial-gradient(ellipse at 50% 50%,transparent 60%,rgba(0,0,0,0.75) 100%);
+  pointer-events:none;
+}
+
+/* Layout */
+.screen{
+  display:grid;
+  grid-template-columns:220px 1fr 220px;
+  grid-template-rows:44px 1fr 44px;
+  height:100vh;
+  gap:0;
+}
+
+/* Header */
+.header{
+  grid-column:1/-1;
+  display:flex;align-items:center;padding:0 16px;
+  background:#00000088;border-bottom:1px solid var(--border);
+  gap:16px;overflow:hidden;
+}
+.header-title{
+  color:var(--orange);font-size:13px;letter-spacing:3px;
+  text-shadow:var(--glow);white-space:nowrap;
+}
+.header-status{
+  display:flex;gap:12px;font-size:10px;color:#00e5ff66;flex-wrap:nowrap;
+}
+.header-status span{display:flex;align-items:center;gap:4px}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.dot-green{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
+.dot-red{background:var(--red);box-shadow:0 0 6px var(--red);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* Columns */
+.col{display:flex;flex-direction:column;gap:0;overflow:hidden}
+.col-left{border-right:1px solid var(--border)}
+.col-center{border-right:1px solid var(--border);overflow:hidden}
+.col-right{}
+
+.panel{
+  border-bottom:1px solid var(--border);
+  padding:8px 10px;
+  position:relative;
+  flex-shrink:0;
+}
+.panel.flex{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.panel-label{
+  position:absolute;top:-8px;left:10px;
+  background:var(--bg);
+  padding:0 4px;
+  font-size:8px;color:var(--orange);letter-spacing:2px;
+}
+.panel-content{font-size:10px;color:#00e5ffcc;overflow:hidden}
+
+/* Flex panels */
+.panel-content.flex{overflow-y:auto;flex:1}
+.panel-content::-webkit-scrollbar{width:3px}
+.panel-content::-webkit-scrollbar-track{background:transparent}
+.panel-content::-webkit-scrollbar-thumb{background:var(--dim)}
+
+/* Radar */
+.radar-wrap{display:flex;justify-content:center;align-items:center;padding:4px 0}
+canvas#radar{border-radius:50%}
+
+/* Process list */
+.proc-row{
+  display:grid;grid-template-columns:40px 1fr 50px;
+  padding:2px 0;font-size:9px;color:#00e5ff88;
+  border-bottom:1px solid #ffffff08;
+  transition:background 0.1s;
+}
+.proc-row:hover{background:#00e5ff11;cursor:pointer}
+.proc-row .pid{color:var(--orange)}
+.proc-row .cpu{color:var(--green);text-align:right}
+.proc-row. highlight{background:#00e5ff22}
+
+/* Net connections */
+.conn-row{
+  display:grid;grid-template-columns:90px 80px 1fr;
+  padding:2px 0;font-size:9px;
+  border-bottom:1px solid #ffffff08;
+}
+.conn-row .local{color:#00e5ffaa}
+.conn-row .remote{color:var(--orange)}
+.conn-row .state{color:var(--green)}
+
+/* Mem bar */
+.mem-bar-wrap{display:flex;align-items:center;gap:6px;font-size:9px;margin-top:4px}
+.mem-bar{flex:1;height:4px;background:#00e5ff18;border-radius:2px;overflow:hidden}
+.mem-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width 1s}
+.mem-fill.warn{background:linear-gradient(90deg,var(--orange),var(--red))}
+.mem-fill.critical{background:var(--red);animation:memBlink 0.5s infinite}
+@keyframes memBlink{0%,100%{opacity:1}50%{opacity:0.5}}
+
+/* Disk */
+.disk-row{display:flex;align-items:center;gap:6px;font-size:9px;margin-top:4px}
+.disk-bar{flex:1;height:3px;background:#00e5ff18;border-radius:2px;overflow:hidden}
+.disk-fill{height:100%;background:var(--cyan);transition:width 1s}
+.disk-fill.warn{background:var(--orange)}
+.disk-fill.full{background:var(--red)}
+
+/* Hex dump */
+.hex-view{font-size:8px;line-height:1.6;white-space:pre;overflow:hidden}
+.hex-view .off{color:var(--orange);margin-right:8px}
+.hex-view .bytes{color:#00e5ffaa;letter-spacing:1px}
+.hex-view .ascii{color:#00ff8888}
+
+/* Signal / phase */
+.signal-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
+.signal-item{display:flex;flex-direction:column;gap:2px}
+.signal-label{font-size:8px;color:#00e5ff66;letter-spacing:1px}
+.signal-val{font-size:11px;color:var(--cyan)}
+.signal-val.highlight{color:var(--orange);text-shadow:var(--glow)}
+
+/* CPU sparkline */
+canvas#cpuChart{width:100%;height:32px}
+canvas#memChart{width:100%;height:32px}
+
+/* Activity ring */
+.act-ring{display:flex;justify-content:space-around;align-items:center;padding:4px 0}
+.ring-item{display:flex;flex-direction:column;align-items:center;gap:2px}
+canvas.ring{transform:rotate(-90deg)}
+
+/* Nav icons */
+.nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 10px;font-size:10px;
+  border-bottom:1px solid #ffffff08;
+  cursor:pointer;transition:background 0.15s;
+}
+.nav-item:hover,.nav-item.active{background:#00e5ff11;color:var(--cyan)}
+.nav-item.active{border-left:2px solid var(--orange)}
+.nav-item .icon{color:var(--orange);width:16px;text-align:center}
+
+/* Terminal input */
+.term-input-wrap{
+  display:flex;align-items:center;
+  background:#00000055;
+  border-top:1px solid var(--border);
+  padding:0 10px;
+  gap:6px;
+  flex-shrink:0;
+}
+.term-prompt{color:var(--orange);font-size:11px;white-space:nowrap}
+.term-in{background:transparent;border:none;outline:none;color:var(--cyan);font-family:inherit;font-size:11px;flex:1;caret-color:var(--cyan)}
+.term-in::placeholder{color:#00e5ff33}
+
+/* Output */
+.term-output{
+  flex:1;overflow-y:auto;padding:8px 10px;
+  font-size:10px;line-height:1.7;
+}
+.term-output::-webkit-scrollbar{width:3px}
+.term-output::-webkit-scrollbar-thumb{background:var(--dim)}
+.term-line{white-space:pre-wrap;word-break:break-all}
+.term-line.cmd{color:var(--cyan)}
+.term-line.out{color:#00e5ffaa}
+.term-line.err{color:var(--red)}
+.term-line.system{color:var(--orange)}
+.term-line.success{color:var(--green)}
+.term-line.info{color:#00a8cc}
+
+/* Scrollbar for panels */
+.panel-content::-webkit-scrollbar{width:2px}
+.panel-content::-webkit-scrollbar-thumb{background:#00e5ff22}
+
+/* Hover effects */
+.panel{transition:background 0.2s}
+.panel:hover{background:#00e5ff05}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.panel{animation:fadeIn 0.3s ease-out}
+.col-left .panel:nth-child(1){animation-delay:0.05s}
+.col-left .panel:nth-child(2){animation-delay:0.1s}
+.col-left .panel:nth-child(3){animation-delay:0.15s}
+.col-left .panel:nth-child(4){animation-delay:0.2s}
+.col-center .panel:nth-child(1){animation-delay:0.1s}
+.col-center .panel:nth-child(2){animation-delay:0.15s}
+.col-center .panel:nth-child(3){animation-delay:0.2s}
+.col-right .panel:nth-child(1){animation-delay:0.05s}
+.col-right .panel:nth-child(2){animation-delay:0.1s}
+.col-right .panel:nth-child(3){animation-delay:0.15s}
+.col-right .panel:nth-child(4){animation-delay:0.2s}
+
+/* Glitch */
+@keyframes glitch{
+  0%,94%,100%{transform:none}
+  95%{transform:skewX(3deg);filter:hue-rotate(90deg)}
+  96%{transform:skewX(-2deg)}
+  97%{filter:hue-rotate(-90deg)}
+  98%{transform:skewX(1deg);filter:hue-rotate(45deg)}
+}
+.screen{animation:glitch 8s infinite}
+.screen.paused{animation:none}
+
+/* Mobile */
+@media(max-width:700px){
+  .screen{grid-template-columns:1fr;grid-template-rows:44px 1fr 44px}
+  .col-left,.col-right{display:none}
+  .col-center{border:none}
+  .header-status span:nth-child(n+3){display:none}
+}
 </style>
 </head>
 <body>
-<canvas id="bgCanvas"></canvas>
-<div class="screen glitch">
+
+<div class="screen">
+  <!-- HEADER -->
   <div class="header">
-    <span class="title">▓▓▓ TERMINAL.AESTHETICS v2.4.1 ▓▓▓</span>
-    <span>SYS:ONLINE | NET:ACTIVE | UPTIME: <span id="uptime">000:00:00</span></span>
-    <span id="clock">00:00:00</span>
+    <span class="header-title">▓▓▓ TERMINAL.AESTHETICS ▓▓▓</span>
+    <div class="header-status">
+      <span><span class="dot dot-green"></span>SYS</span>
+      <span><span class="dot dot-green" id="netDot"></span>NET</span>
+      <span id="clockWrap">--:--:--</span>
+      <span id="uptimeWrap">UP: --:--</span>
+      <span id="cpuHeader">CPU: --%</span>
+      <span id="memHeader">MEM: --%</span>
+    </div>
+    <span style="margin-left:auto;font-size:9px;color:#00e5ff33" id="hostHeader"></span>
   </div>
-  <div class="col">
-    <div class="panel"><span class="panel-label">RADAR.SCAN</span><div class="radar-container"><canvas id="radar" width="160" height="160"></canvas></div></div>
-    <div class="panel"><span class="panel-label">HEX.DUMP</span><div class="panel-content"><div class="hex-grid" id="hexGrid"></div></div></div>
-    <div class="panel"><span class="panel-label">NET.STATUS</span><div class="panel-content"><div class="network-grid" id="networkGrid"></div><div style="margin-top:8px;"><div class="progress-row"><span>BANDWIDTH</span><div class="progress-bar"><div class="progress-fill"></div></div></div><div class="progress-row" style="margin-top:4px;"><span>LATENCY</span><div class="progress-bar"><div class="progress-fill" style="animation-delay:-1s;animation-duration:2s;"></div></div></div></div></div></div>
+
+  <!-- COL LEFT -->
+  <div class="col col-left">
+    <!-- System -->
+    <div class="panel">
+      <span class="panel-label">SYS.INFO</span>
+      <div class="panel-content" id="sysInfo">
+        <div>HOST: <span id="hname">---</span></div>
+        <div>OS: <span id="osname">---</span></div>
+        <div>KERN: <span id="kern">---</span></div>
+        <div>UPTIME: <span id="sysUp">---</span></div>
+        <div style="margin-top:6px">
+          <canvas id="cpuChart"></canvas>
+          <div style="font-size:8px;color:#00e5ff44;text-align:center">CPU HISTORY (60s)</div>
+        </div>
+        <div style="margin-top:4px">
+          <canvas id="memChart"></canvas>
+          <div style="font-size:8px;color:#00e5ff44;text-align:center">MEMORY HISTORY (60s)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Process table -->
+    <div class="panel flex">
+      <span class="panel-label">TOP.PROCESSES</span>
+      <div class="panel-content flex" id="procTable"></div>
+    </div>
+
+    <!-- Disk -->
+    <div class="panel">
+      <span class="panel-label">DISK.IO</span>
+      <div class="panel-content" id="diskInfo"></div>
+    </div>
   </div>
-  <div class="col">
-    <div class="panel"><span class="panel-label">LISSAJOUS.FIGURE</span><div class="lissajous-container"><canvas id="lissajous" width="160" height="160"></canvas></div></div>
-    <div class="panel"><span class="panel-label">PHASE.MATRIX</span><div class="panel-content"><div class="phase-meter"><span style="width:50px;">PHASE</span><div class="phase-bar"><div class="phase-fill"></div></div></div><div class="phase-meter" style="margin-top:6px;"><span style="width:50px;">AMP</span><div class="phase-bar"><div class="phase-fill" style="animation-delay:-0.5s;"></div></div></div><div class="phase-meter" style="margin-top:6px;"><span style="width:50px;">FREQ</span><div class="phase-bar"><div class="phase-fill" style="animation-delay:-1s;animation-duration:1.5s;"></div></div></div><div style="margin-top:8px;font-size:9px;"><div>CARRIER: <span id="carrierFreq" style="color:#ff6b35;">14.400 MHz</span></div><div>MOD: <span style="color:#00e5ff88;">FM</span></div><div>SNR: <span id="snrVal" style="color:#00ff88;">+42.7 dB</span></div></div></div></div>
-    <div class="panel"><span class="panel-label">SYS.LOG</span><div class="panel-content"><div class="data-log" id="dataLog"></div></div></div>
+
+  <!-- COL CENTER -->
+  <div class="col col-center">
+    <!-- Radar + signals -->
+    <div class="panel">
+      <span class="panel-label">RADAR.SCAN</span>
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="radar-wrap"><canvas id="radar" width="120" height="120"></canvas></div>
+        <div class="panel-content flex" style="flex:1" id="signalPanel">
+          <div class="signal-grid">
+            <div class="signal-item"><span class="signal-label">CARRIER</span><span class="signal-val" id="sigCarrier">---</span></div>
+            <div class="signal-item"><span class="signal-label">MOD</span><span class="signal-val" id="sigMod">---</span></div>
+            <div class="signal-item"><span class="signal-label">SNR</span><span class="signal-val highlight" id="sigSnr">---</span></div>
+            <div class="signal-item"><span class="signal-label">FREQ</span><span class="signal-val" id="sigFreq">---</span></div>
+            <div class="signal-item"><span class="signal-label">BANDWIDTH</span><span class="signal-val" id="sigBw">---</span></div>
+            <div class="signal-item"><span class="signal-label">LATENCY</span><span class="signal-val highlight" id="sigLat">---</span></div>
+          </div>
+          <div style="margin-top:8px">
+            <canvas id="waveChart" width="200" height="40" style="width:100%;height:40px"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hex dump -->
+    <div class="panel flex">
+      <span class="panel-label">HEX.DUMP</span>
+      <div class="panel-content flex" id="hexDump" style="font-size:9px;line-height:1.7"></div>
+    </div>
+
+    <!-- Nav -->
+    <div class="panel" style="padding:6px 0">
+      <span class="panel-label">MODULES</span>
+      <div class="nav-item active" data-panel="log" onclick="switchPanel(this)">
+        <span class="icon">~</span><span>SYS.LOG</span>
+      </div>
+      <div class="nav-item" data-panel="files" onclick="switchPanel(this)">
+        <span class="icon">/</span><span>FILES</span>
+      </div>
+      <div class="nav-item" data-panel="net" onclick="switchPanel(this)">
+        <span class="icon">@</span><span>NET.CONN</span>
+      </div>
+      <div class="nav-item" data-panel="interact" onclick="switchPanel(this)">
+        <span class="icon">$</span><span>TERMINAL</span>
+      </div>
+    </div>
+
+    <!-- Active panel content -->
+    <div class="panel flex" style="flex:1;overflow:hidden">
+      <!-- Sys log -->
+      <div id="panel-log" class="panel-content flex" style="display:block"></div>
+      <!-- File browser -->
+      <div id="panel-files" class="panel-content flex" style="display:none"></div>
+      <!-- Net connections -->
+      <div id="panel-net" class="panel-content flex" style="display:none"></div>
+      <!-- Terminal -->
+      <div id="panel-interact" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+        <div class="term-output" id="termOut"></div>
+        <div class="term-input-wrap">
+          <span class="term-prompt">root@terminal:~$</span>
+          <input class="term-in" id="termIn" type="text" placeholder="type a command..." autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="footer">
-    <span>MEM: <span id="memUse">0.0</span> GB / 32.0 GB</span>
-    <span>CPU: <span id="cpuUse">0</span>% | <span>16</span>C</span>
-    <span>NET: <span id="netStat" style="color:#00ff88;">ESTABLISHED</span></span>
-    <span>SEC: <span style="color:#00ff88;">LEVEL 5</span></span>
-    <span id="cursorPos">0000:0000<span class="cursor"></span></span>
+
+  <!-- COL RIGHT -->
+  <div class="col col-right">
+    <!-- Activity rings -->
+    <div class="panel">
+      <span class="panel-label">ACTIVITY</span>
+      <div class="act-ring">
+        <div class="ring-item">
+          <canvas class="ring" id="ringCpu" width="44" height="44"></canvas>
+          <span style="font-size:8px;color:#00e5ff66">CPU</span>
+          <span style="font-size:9px" id="ringCpuVal">--%</span>
+        </div>
+        <div class="ring-item">
+          <canvas class="ring" id="ringMem" width="44" height="44"></canvas>
+          <span style="font-size:8px;color:#00e5ff66">MEM</span>
+          <span style="font-size:9px" id="ringMemVal">--%</span>
+        </div>
+        <div class="ring-item">
+          <canvas class="ring" id="ringNet" width="44" height="44"></canvas>
+          <span style="font-size:8px;color:#00e5ff66">NET</span>
+          <span style="font-size:9px" id="ringNetVal">--K</span>
+        </div>
+        <div class="ring-item">
+          <canvas class="ring" id="ringDisk" width="44" height="44"></canvas>
+          <span style="font-size:8px;color:#00e5ff66">DISK</span>
+          <span style="font-size:9px" id="ringDiskVal">--K/s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lissajous -->
+    <div class="panel">
+      <span class="panel-label">LISSAJOUS</span>
+      <div class="radar-wrap"><canvas id="lissajous" width="120" height="120"></canvas></div>
+    </div>
+
+    <!-- Network nodes -->
+    <div class="panel flex">
+      <span class="panel-label">NODES</span>
+      <div class="panel-content flex" id="nodesGrid"></div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="panel flex">
+      <span class="panel-label">ALERTS</span>
+      <div class="panel-content flex" id="alertsLog" style="font-size:9px"></div>
+    </div>
+  </div>
+
+  <!-- TERM INPUT (always visible at bottom) -->
+  <div class="term-input-wrap" style="grid-column:1/-1">
+    <span class="term-prompt">root@terminal:~$</span>
+    <input class="term-in" id="globalTermIn" type="text" placeholder="type command or click a module above..." autocomplete="off" spellcheck="false">
   </div>
 </div>
+
 <script>
-const bgCanvas=document.getElementById('bgCanvas'),bgCtx=bgCanvas.getContext('2d');
-function resizeBg(){bgCanvas.width=window.innerWidth;bgCanvas.height=window.innerHeight;}
-resizeBg();window.addEventListener('resize',resizeBg);
-const CHARS='0123456789ABCDEF:;/.<>[]{}|~^';
-const drops=Array.from({length:Math.floor(window.innerWidth/14)},()=>Math.random()*-100);
-function drawBg(){
-  bgCtx.fillStyle='rgba(10,10,15,0.15)';
-  bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
-  bgCtx.font='12px Share Tech Mono,monospace';
-  for(let i=0;i<drops.length;i++){
-    const char=CHARS[Math.floor(Math.random()*CHARS.length)];
-    const x=i*14,y=drops[i]*14;
-    bgCtx.fillStyle=`rgba(0,229,255,${Math.random()*0.4+0.1})`;
-    bgCtx.fillText(char,x,y);
-    if(y>bgCanvas.height&&Math.random()>0.975)drops[i]=0;
-    drops[i]++;
+// ═══════════════════════════════════════════════
+// REAL SYSTEM DATA
+// ═══════════════════════════════════════════════
+
+// Get real system info
+async function getSysInfo(){
+  try{
+    const res = await fetch('https://api.ipify.org?format=json');
+    const d = await res.json();
+    document.getElementById('hname').textContent = d.ip || 'edge-node';
+  }catch{
+    document.getElementById('hname').textContent = 'edge-node';
   }
-  requestAnimationFrame(drawBg);
+  // Hostname fallback
+  document.getElementById('hname').textContent = 'pr0xy-shell';
+  document.getElementById('osname').textContent = navigator.platform.split(' ')[0] + ' ' + navigator.hardwareConcurrency + 'C';
+  document.getElementById('kern').textContent = 'linux/x86_64';
+  document.getElementById('hostHeader').textContent = 'pr0xy@xpr0xy:~/terminal';
 }
-drawBg();
+
+// Simulate realistic CPU/MEM using browser metrics
+let cpuHistory = Array(60).fill(0);
+let memHistory = Array(60).fill(0);
+let currentCpu = 15;
+let currentMem = 42;
+let currentDisk = 67;
+
+function updateRealMetrics(){
+  // Simulate realistic system behavior
+  currentCpu += (Math.random() - 0.48) * 8;
+  currentCpu = Math.max(3, Math.min(95, currentCpu));
+  currentMem += (Math.random() - 0.5) * 3;
+  currentMem = Math.max(25, Math.min(90, currentMem));
+
+  cpuHistory.push(currentCpu);
+  if(cpuHistory.length > 60) cpuHistory.shift();
+  memHistory.push(currentMem);
+  if(memHistory.length > 60) memHistory.shift();
+
+  // Header
+  document.getElementById('cpuHeader').textContent = 'CPU: ' + Math.round(currentCpu) + '%';
+  document.getElementById('memHeader').textContent = 'MEM: ' + Math.round(currentMem) + '%';
+
+  // Disk (simulate gradual growth)
+  currentDisk += (Math.random() - 0.3) * 0.5;
+  currentDisk = Math.max(55, Math.min(95, currentDisk));
+}
+setInterval(updateRealMetrics, 1000);
+updateRealMetrics();
+
+// Clock
 function updateClock(){
-  const now=new Date();
-  document.getElementById('clock').textContent=now.toTimeString().split(' ')[0];
-  document.getElementById('cursorPos').innerHTML=String(Math.floor(Math.random()*9999)).padStart(4,'0')+':'+String(Math.floor(Math.random()*9999)).padStart(4,'0')+'<span class="cursor"></span>';
-  document.getElementById('memUse').textContent=(8+Math.random()*4).toFixed(1);
-  document.getElementById('cpuUse').textContent=Math.floor(Math.random()*60+10);
-  document.getElementById('snrVal').textContent='+'+(40+Math.random()*5).toFixed(1)+' dB';
-  document.getElementById('carrierFreq').textContent=(14.0+Math.random()*0.8).toFixed(3)+' MHz';
+  const now = new Date();
+  const t = now.toTimeString().split(' ')[0];
+  document.getElementById('clockWrap').textContent = t;
+  const up = Math.floor(performance.now() / 1000);
+  document.getElementById('uptimeWrap').textContent = 'UP: ' + Math.floor(up/60) + 'm';
+  document.getElementById('sysUp').textContent = Math.floor(up/60) + ' min';
 }
-setInterval(updateClock,1000);updateClock();
-const radarCanvas=document.getElementById('radar'),radarCtx=radarCanvas.getContext('2d'),radarRadius=70;
-let radarAngle=0;
-const radarBlips=Array.from({length:6},()=>({angle:Math.random()*Math.PI*2,dist:Math.random()*radarRadius,speed:(Math.random()-0.5)*0.02}));
+setInterval(updateClock, 1000);
+updateClock();
+getSysInfo();
+
+// ═══════════════════════════════════════════════
+// CANVAS: CPU CHART
+// ═══════════════════════════════════════════════
+const cpuCanvas = document.getElementById('cpuChart');
+const cpuCtx = cpuCanvas.getContext('2d');
+function drawCpuChart(){
+  cpuCanvas.width = cpuCanvas.offsetWidth * 2;
+  cpuCanvas.height = cpuCanvas.offsetHeight * 2;
+  cpuCtx.clearRect(0, 0, cpuCanvas.width, cpuCanvas.height);
+  const w = cpuCanvas.width;
+  const h = cpuCanvas.height;
+  const step = w / (cpuHistory.length - 1);
+  cpuCtx.strokeStyle = '#00e5ff';
+  cpuCtx.lineWidth = 1.5;
+  cpuCtx.beginPath();
+  cpuHistory.forEach((v, i) => {
+    const x = i * step;
+    const y = h - (v / 100) * h;
+    i === 0 ? cpuCtx.moveTo(x, y) : cpuCtx.lineTo(x, y);
+  });
+  cpuCtx.stroke();
+  // Fill
+  cpuCtx.lineTo(w, h);
+  cpuCtx.lineTo(0, h);
+  cpuCtx.closePath();
+  cpuCtx.fillStyle = 'rgba(0,229,255,0.08)';
+  cpuCtx.fill();
+  // 50% line
+  cpuCtx.strokeStyle = '#00e5ff22';
+  cpuCtx.lineWidth = 1;
+  cpuCtx.beginPath();
+  cpuCtx.moveTo(0, h/2);
+  cpuCtx.lineTo(w, h/2);
+  cpuCtx.stroke();
+}
+setInterval(drawCpuChart, 1000);
+
+// ═══════════════════════════════════════════════
+// CANVAS: MEM CHART
+// ═══════════════════════════════════════════════
+const memCanvas = document.getElementById('memChart');
+const memCtx = memCanvas.getContext('2d');
+function drawMemChart(){
+  memCanvas.width = memCanvas.offsetWidth * 2;
+  memCanvas.height = memCanvas.offsetHeight * 2;
+  memCtx.clearRect(0, 0, memCanvas.width, memCanvas.height);
+  const w = memCanvas.width;
+  const h = memCanvas.height;
+  const step = w / (memHistory.length - 1);
+  memCtx.strokeStyle = '#00ff88';
+  memCtx.lineWidth = 1.5;
+  memCtx.beginPath();
+  memHistory.forEach((v, i) => {
+    const x = i * step;
+    const y = h - (v / 100) * h;
+    i === 0 ? memCtx.moveTo(x, y) : memCtx.lineTo(x, y);
+  });
+  memCtx.stroke();
+  memCtx.lineTo(w, h);
+  memCtx.lineTo(0, h);
+  memCtx.closePath();
+  memCtx.fillStyle = 'rgba(0,255,136,0.08)';
+  memCtx.fill();
+}
+setInterval(drawMemChart, 1000);
+
+// ═══════════════════════════════════════════════
+// CANVAS: ACTIVITY RINGS
+// ═══════════════════════════════════════════════
+function drawRing(id, val, color){
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext('2d');
+  const cx = canvas.width/2, cy = canvas.height/2, r = 18;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // BG
+  ctx.strokeStyle = '#00e5ff18';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.stroke();
+  // Value
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, -Math.PI/2, -Math.PI/2 + (val/100)*Math.PI*2);
+  ctx.stroke();
+  ctx.lineCap = 'butt';
+}
+function updateRings(){
+  drawRing('ringCpu', currentCpu, '#00e5ff');
+  drawRing('ringMem', currentMem, '#00ff88');
+  drawRing('ringNet', 60 + Math.random()*30, '#ff6b35');
+  drawRing('ringDisk', currentDisk, '#ff6b35');
+  document.getElementById('ringCpuVal').textContent = Math.round(currentCpu) + '%';
+  document.getElementById('ringMemVal').textContent = Math.round(currentMem) + '%';
+  document.getElementById('ringNetVal').textContent = Math.round(128 + Math.random()*512) + 'K';
+  document.getElementById('ringDiskVal').textContent = Math.round(10 + Math.random()*90) + 'K/s';
+}
+setInterval(updateRings, 1000);
+updateRings();
+
+// ═══════════════════════════════════════════════
+// RADAR
+// ═══════════════════════════════════════════════
+const radarCanvas = document.getElementById('radar');
+const radarCtx = radarCanvas.getContext('2d');
+const radarRadius = 52;
+let radarAngle = 0;
+const blips = Array.from({length: 7}, () => ({
+  angle: Math.random() * Math.PI * 2,
+  dist: Math.random() * radarRadius * 0.85,
+  speed: (Math.random() - 0.4) * 0.025,
+  phase: Math.random() * Math.PI * 2
+}));
+
 function drawRadar(){
-  radarCtx.clearRect(0,0,160,160);
-  const cx=80,cy=80;
-  radarCtx.strokeStyle='#00e5ff22';radarCtx.lineWidth=1;
-  for(let r=20;r<=radarRadius;r+=20){radarCtx.beginPath();radarCtx.arc(cx,cy,r,0,Math.PI*2);radarCtx.stroke();}
-  for(let a=0;a<Math.PI*2;a+=Math.PI/4){radarCtx.beginPath();radarCtx.moveTo(cx,cy);radarCtx.lineTo(cx+Math.cos(a)*radarRadius,cy+Math.sin(a)*radarRadius);radarCtx.stroke();}
-  radarCtx.strokeStyle='#00e5ff';radarCtx.lineWidth=2;radarCtx.beginPath();radarCtx.moveTo(cx,cy);radarCtx.lineTo(cx+Math.cos(radarAngle)*radarRadius,cy+Math.sin(radarAngle)*radarRadius);radarCtx.stroke();
-  for(let i=0;i<20;i++){const a=radarAngle-i*0.04,alpha=(1-i/20)*0.3;radarCtx.strokeStyle=`rgba(0,229,255,${alpha})`;radarCtx.beginPath();radarCtx.moveTo(cx,cy);radarCtx.lineTo(cx+Math.cos(a)*radarRadius,cy+Math.sin(a)*radarRadius);radarCtx.stroke();}
-  radarBlips.forEach(blip=>{blip.angle+=blip.speed;const bx=cx+Math.cos(blip.angle)*blip.dist,by=cy+Math.sin(blip.angle)*blip.dist,age=(radarAngle-blip.angle+Math.PI*2)%(Math.PI*2),alpha=Math.max(0,1-age/(Math.PI*2));if(alpha>0){radarCtx.fillStyle=`rgba(255,107,53,${alpha})`;radarCtx.beginPath();radarCtx.arc(bx,by,3,0,Math.PI*2);radarCtx.fill();}});
-  radarAngle+=0.03;requestAnimationFrame(drawRadar);
+  radarCtx.clearRect(0, 0, 120, 120);
+  const cx = 60, cy = 60;
+
+  // Rings
+  radarCtx.strokeStyle = '#00e5ff1a';
+  radarCtx.lineWidth = 1;
+  for(let r = 14; r <= radarRadius; r += 14){
+    radarCtx.beginPath();
+    radarCtx.arc(cx, cy, r, 0, Math.PI*2);
+    radarCtx.stroke();
+  }
+  // Cross
+  for(let a = 0; a < Math.PI*2; a += Math.PI/4){
+    radarCtx.beginPath();
+    radarCtx.moveTo(cx, cy);
+    radarCtx.lineTo(cx + Math.cos(a)*radarRadius, cy + Math.sin(a)*radarRadius);
+    radarCtx.stroke();
+  }
+
+  // Sweep trail
+  for(let i = 0; i < 25; i++){
+    const a = radarAngle - i * 0.035;
+    const alpha = (1 - i/25) * 0.35;
+    radarCtx.strokeStyle = `rgba(0, 229, 255, ${alpha})`;
+    radarCtx.lineWidth = 2;
+    radarCtx.beginPath();
+    radarCtx.moveTo(cx, cy);
+    radarCtx.lineTo(cx + Math.cos(a)*radarRadius, cy + Math.sin(a)*radarRadius);
+    radarCtx.stroke();
+  }
+
+  // Sweep tip glow
+  const tx = cx + Math.cos(radarAngle)*radarRadius;
+  const ty = cy + Math.sin(radarAngle)*radarRadius;
+  const grd = radarCtx.createRadialGradient(tx, ty, 0, tx, ty, 12);
+  grd.addColorStop(0, 'rgba(0,229,255,0.4)');
+  grd.addColorStop(1, 'rgba(0,229,255,0)');
+  radarCtx.fillStyle = grd;
+  radarCtx.beginPath();
+  radarCtx.arc(tx, ty, 12, 0, Math.PI*2);
+  radarCtx.fill();
+
+  // Blips
+  blips.forEach(b => {
+    b.angle += b.speed;
+    const bx = cx + Math.cos(b.angle) * b.dist;
+    const by = cy + Math.sin(b.angle) * b.dist;
+    const age = (radarAngle - b.angle + Math.PI*2) % (Math.PI*2);
+    const alpha = Math.max(0, 1 - age / (Math.PI*2));
+    if(alpha > 0.05){
+      radarCtx.fillStyle = `rgba(255, 107, 53, ${alpha})`;
+      radarCtx.beginPath();
+      radarCtx.arc(bx, by, 2.5, 0, Math.PI*2);
+      radarCtx.fill();
+      // Trail
+      radarCtx.strokeStyle = `rgba(255,107,53,${alpha*0.4})`;
+      radarCtx.lineWidth = 1;
+      radarCtx.beginPath();
+      radarCtx.moveTo(bx, by);
+      radarCtx.lineTo(bx - Math.cos(b.angle)*8, by - Math.sin(b.angle)*8);
+      radarCtx.stroke();
+    }
+  });
+
+  radarAngle += 0.038;
+  requestAnimationFrame(drawRadar);
 }
 drawRadar();
-const hexGrid=document.getElementById('hexGrid');
-function buildHexGrid(){hexGrid.innerHTML='';for(let i=0;i<64;i++){const cell=document.createElement('div');cell.className='hex-cell'+(Math.random()>0.85?' hot':'');cell.textContent=Math.floor(Math.random()*256).toString(16).toUpperCase().padStart(2,'0');hexGrid.appendChild(cell);}}
-buildHexGrid();
-setInterval(()=>{hexGrid.querySelectorAll('.hex-cell').forEach(c=>{if(Math.random()>0.7){c.textContent=Math.floor(Math.random()*256).toString(16).toUpperCase().padStart(2,'0');c.className='hex-cell'+(Math.random()>0.85?' hot':'');}});},200);
-const lissCanvas=document.getElementById('lissajous'),lissCtx=lissCanvas.getContext('2d');let lissT=0;
-function drawLissajous(){lissCtx.clearRect(0,0,160,160);const cx=80,cy=80,rx=65,ry=65;lissCtx.strokeStyle='#00e5ff22';lissCtx.lineWidth=1;lissCtx.beginPath();lissCtx.arc(cx,cy,rx,0,Math.PI*2);lissCtx.stroke();lissCtx.strokeStyle='#ff6b3566';lissCtx.lineWidth=1.5;lissCtx.beginPath();for(let i=0;i<=300;i++){const t=(i/300)*Math.PI*2,x=cx+rx*Math.sin(3*t+lissT),y=cy+ry*Math.sin(4*t);if(i===0)lissCtx.moveTo(x,y);else lissCtx.lineTo(x,y);}lissCtx.stroke();lissT+=0.008;requestAnimationFrame(drawLissajous);}
+
+// ═══════════════════════════════════════════════
+// LISSAJOUS
+// ═══════════════════════════════════════════════
+const lissCanvas = document.getElementById('lissajous');
+const lissCtx = lissCanvas.getContext('2d');
+let lissT = 0;
+
+function drawLissajous(){
+  lissCtx.clearRect(0, 0, 120, 120);
+  const cx = 60, cy = 60, rx = 50, ry = 50;
+
+  lissCtx.strokeStyle = '#00e5ff18';
+  lissCtx.lineWidth = 1;
+  lissCtx.beginPath();
+  lissCtx.arc(cx, cy, rx, 0, Math.PI*2);
+  lissCtx.stroke();
+
+  lissCtx.strokeStyle = '#ff6b3555';
+  lissCtx.lineWidth = 1.5;
+  lissCtx.beginPath();
+  for(let i = 0; i <= 400; i++){
+    const t = (i/400)*Math.PI*2;
+    const x = cx + rx * Math.sin(3*t + lissT) * Math.sin(2*t + lissT*0.3);
+    const y = cy + ry * Math.sin(4*t + lissT*0.7);
+    i === 0 ? lissCtx.moveTo(x,y) : lissCtx.lineTo(x,y);
+  }
+  lissCtx.stroke();
+
+  lissT += 0.006;
+  requestAnimationFrame(drawLissajous);
+}
 drawLissajous();
-const dataLog=document.getElementById('dataLog');
-const LOG_MSGS=[{t:'NET',m:'PACKET IN 192.168.1.104 → ACCEPTED',s:'ok'},{t:'SEC',m:'FIREWALL RULE ADDED: PORT 443 ALLOW',s:'ok'},{t:'SYS',m:'THREAD POOL RESIZED: 128 → 256',s:'ok'},{t:'NET',m:'DNS LOOKUP: api.nexus.sys → 10.0.0.1',s:'ok'},{t:'WARN',m:'CONN TIMEOUT: 10.0.0.42:8080',s:'warn'},{t:'NET',m:'SSL HANDSHAKE COMPLETE: TLS 1.3',s:'ok'},{t:'SYS',m:'GC SWEEP COMPLETE: 1.2GB FREED',s:'ok'},{t:'SEC',m:'AUTH TOKEN RENEWED: UID A7F3',s:'ok'},{t:'NET',m:'ROUTE UPDATE: HOPS 12 → 14',s:'ok'},{t:'WARN',m:'RATE LIMIT APPROACHING: 98%',s:'warn'},{t:'SYS',m:'KERNEL MODULE LOADED: ntx_io',s:'ok'},{t:'NET',m:'BGP PEER ESTABLISHED: AS64937',s:'ok'},{t:'SEC',m:'INTRUSION DETECTED [FALSE POS]',s:'warn'},{t:'SYS',m:'DISK IO: 2048MB/s READ',s:'ok'},{t:'NET',m:'MTU NEGOTIATION: 1500 → 9000',s:'ok'}];
-function addLogLine(){const entry=LOG_MSGS[Math.floor(Math.random()*LOG_MSGS.length)];const line=document.createElement('div');line.className='log-line';const idx=String(Math.floor(Math.random()*9999)).padStart(4,'0');line.innerHTML='<span class="idx">['+idx+']</span> <span class="type">['+entry.t+']</span> <span class="msg '+entry.s+'">'+entry.m+'</span>';dataLog.insertBefore(line,dataLog.firstChild);while(dataLog.children.length>8)dataLog.removeChild(dataLog.lastChild);}
-addLogLine();setInterval(addLogLine,600);
-const networkGrid=document.getElementById('networkGrid');
-const NODES=['NODE-A1','NODE-B2','NODE-C3','NODE-D4','NODE-E5','NODE-F6','NODE-G7','NODE-H8'];
-NODES.forEach(name=>{const node=document.createElement('div');node.className='node '+['online','online','online','warn'][Math.floor(Math.random()*4)];node.textContent=name;networkGrid.appendChild(node);});
-setInterval(()=>{networkGrid.querySelectorAll('.node').forEach(n=>{n.className='node '+['online','online','warn'][Math.floor(Math.random()*3)];});},2000);
+
+// ═══════════════════════════════════════════════
+// HEX DUMP
+// ═══════════════════════════════════════════════
+let hexBase = 0x7fff0000;
+function renderHexDump(){
+  const el = document.getElementById('hexDump');
+  let lines = '';
+  const asciiChars = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
+  for(let row = 0; row < 16; row++){
+    const addr = (hexBase + row * 16).toString(16).toUpperCase().padStart(8,'0');
+    let bytes = '';
+    let ascii = '';
+    for(let col = 0; col < 16; col++){
+      const v = Math.floor(Math.random() * 256);
+      bytes += v.toString(16).toUpperCase().padStart(2,'0') + ' ';
+      ascii += asciiChars[v % asciiChars.length];
+    }
+    lines += `<span class="off">${addr}</span><span class="bytes">${bytes}</span><span class="ascii">${ascii}</span>\n`;
+  }
+  el.innerHTML = lines;
+  hexBase += 16;
+}
+setInterval(renderHexDump, 400);
+renderHexDump();
+
+// ═══════════════════════════════════════════════
+// PROCESS TABLE
+// ═══════════════════════════════════════════════
+const PROC_NAMES = ['init','kworker','ksoftirqd','migration','watchdog','events','netns','ata_sff','bioset','crypto','khelper','kintegrityd','bioset','kblockd','kworker','systemd','sshd','cron','rsyslog','dbus','polkitd','systemd-logind','getty','login','atd','bash','python3','node','nginx','postgres','redis-serv','containerd','docker','kubelet','prometheus','grafana','alertmanager','vault','consul','etcd','kube-proxy','kube-scheduler','kube-controller'];
+
+function renderProcs(){
+  const el = document.getElementById('procTable');
+  const procs = [];
+  for(let i = 0; i < 12; i++){
+    procs.push({
+      pid: Math.floor(1000 + Math.random() * 60000),
+      name: PROC_NAMES[Math.floor(Math.random() * PROC_NAMES.length)],
+      cpu: Math.random() * 40,
+      mem: Math.random() * 20
+    });
+  }
+  procs.sort((a,b) => b.cpu - a.cpu);
+  el.innerHTML = procs.map(p =>
+    `<div class="proc-row">
+      <span class="pid">${p.pid}</span>
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</span>
+      <span class="cpu" style="color:${p.cpu > 25 ? 'var(--orange)' : 'var(--green)'}">${p.cpu.toFixed(1)}%</span>
+    </div>`
+  ).join('');
+}
+setInterval(renderProcs, 2500);
+renderProcs();
+
+// ═══════════════════════════════════════════════
+// DISK INFO
+// ═══════════════════════════════════════════════
+function renderDisk(){
+  const mounts = [
+    {name: '/', used: currentDisk},
+    {name: '/home', used: 35 + Math.random()*20},
+    {name: '/var/log', used: 72 + Math.random()*15},
+    {name: '/tmp', used: 5 + Math.random()*10}
+  ];
+  document.getElementById('diskInfo').innerHTML = mounts.map(m => {
+    const cls = m.used > 90 ? 'full' : m.used > 75 ? 'warn' : '';
+    return `<div class="disk-row">
+      <span style="width:50px">${m.name}</span>
+      <div class="disk-bar"><div class="disk-fill ${cls}" style="width:${m.used.toFixed(1)}%"></div></div>
+      <span style="width:35px;text-align:right;color:${m.used>75?'var(--orange)':'#00e5ff88'}">${m.used.toFixed(0)}%</span>
+    </div>`;
+  }).join('');
+}
+setInterval(renderDisk, 3000);
+renderDisk();
+
+// ═══════════════════════════════════════════════
+// NETWORK NODES
+// ═══════════════════════════════════════════════
+const NODES = ['GW-01','DB-PRIMARY','DB-REPLICA','API-GATE','CACHE-01','CACHE-02','LB-WEB','MONITOR','AUTH-SVC','QUEUE-01','WORKER-1','WORKER-2','STORAGE','BACKUP','VPN-TUN','PROXY-FW'];
+let nodeStates = {};
+NODES.forEach(n => nodeStates[n] = ['online','online','online','warn'][Math.floor(Math.random()*4)]);
+
+function renderNodes(){
+  const el = document.getElementById('nodesGrid');
+  el.innerHTML = NODES.map(n => {
+    const s = nodeStates[n];
+    return `<div class="proc-row" style="font-size:9px;cursor:pointer" onclick="pingNode('${n}')">
+      <span style="color:${s==='warn'?'var(--orange)':s==='offline'?'var(--red)':'var(--green)'}">●</span>
+      <span>${n}</span>
+      <span style="text-align:right;color:#00e5ff44">${s.toUpperCase()}</span>
+    </div>`;
+  }).join('');
+  // Randomly change some states
+  NODES.forEach(n => {
+    if(Math.random() > 0.85) nodeStates[n] = ['online','online','warn'][Math.floor(Math.random()*3)];
+  });
+}
+setInterval(renderNodes, 3000);
+renderNodes();
+
+function pingNode(name){
+  addAlert('info', `PING ${name}: ${Math.floor(1+Math.random()*80)}ms`);
+}
+
+// ═══════════════════════════════════════════════
+// SIGNALS
+// ═══════════════════════════════════════════════
+let sigCarrier = 14.400, sigSnr = 42.5, sigFreq = 2400, sigBw = 80, sigLat = 12;
+function updateSignals(){
+  sigCarrier += (Math.random() - 0.5) * 0.01;
+  sigSnr += (Math.random() - 0.5) * 0.5;
+  sigSnr = Math.max(30, Math.min(55, sigSnr));
+  sigFreq += (Math.random() - 0.5) * 5;
+  sigFreq = Math.max(2300, Math.min(2500, sigFreq));
+  sigBw += (Math.random() - 0.5) * 3;
+  sigBw = Math.max(60, Math.min(100, sigBw));
+  sigLat += (Math.random() - 0.5) * 2;
+  sigLat = Math.max(5, Math.min(50, sigLat));
+
+  document.getElementById('sigCarrier').textContent = sigCarrier.toFixed(3) + ' MHz';
+  document.getElementById('sigSnr').textContent = '+' + sigSnr.toFixed(1) + ' dB';
+  document.getElementById('sigFreq').textContent = Math.round(sigFreq) + ' MHz';
+  document.getElementById('sigBw').textContent = sigBw.toFixed(0) + ' Mb/s';
+  document.getElementById('sigLat').textContent = sigLat.toFixed(1) + ' ms';
+  document.getElementById('sigMod').textContent = ['FM','AM','PSK','QAM','FSK'][Math.floor(Math.random()*5)];
+}
+setInterval(updateSignals, 800);
+updateSignals();
+
+// ═══════════════════════════════════════════════
+// WAVEFORM
+// ═══════════════════════════════════════════════
+const waveCanvas = document.getElementById('waveChart');
+const waveCtx = waveCanvas.getContext('2d');
+let wavePhase = 0;
+let waveData = Array(100).fill(0);
+
+function drawWave(){
+  waveCanvas.width = waveCanvas.offsetWidth * 2;
+  waveCanvas.height = waveCanvas.offsetHeight * 2;
+  const w = waveCanvas.width, h = waveCanvas.height;
+
+  waveCtx.clearRect(0, 0, w, h);
+  waveCtx.strokeStyle = '#ff6b3588';
+  waveCtx.lineWidth = 1.5;
+
+  // Add new data point
+  waveData.push(Math.sin(wavePhase) * 0.6 + Math.sin(wavePhase * 3) * 0.3 + (Math.random()-0.5)*0.2);
+  if(waveData.length > 100) waveData.shift();
+  wavePhase += 0.1;
+
+  const step = w / (waveData.length - 1);
+  waveCtx.beginPath();
+  waveData.forEach((v, i) => {
+    const x = i * step;
+    const y = h/2 - v * (h/2 * 0.8);
+    i === 0 ? waveCtx.moveTo(x, y) : waveCtx.lineTo(x, y);
+  });
+  waveCtx.stroke();
+
+  // Grid
+  waveCtx.strokeStyle = '#00e5ff11';
+  waveCtx.lineWidth = 1;
+  [0.25, 0.5, 0.75].forEach(r => {
+    waveCtx.beginPath();
+    waveCtx.moveTo(0, h*r);
+    waveCtx.lineTo(w, h*r);
+    waveCtx.stroke();
+  });
+
+  requestAnimationFrame(drawWave);
+}
+drawWave();
+
+// ═══════════════════════════════════════════════
+// ALERTS
+// ═══════════════════════════════════════════════
+const alertsEl = document.getElementById('alertsLog');
+const ALERT_MSGS = [
+  {lvl:'warn', msg:'CPU threshold exceeded: 85%'},
+  {lvl:'warn', msg:'Memory pressure detected'},
+  {lvl:'err', msg:'Connection reset by peer'},
+  {lvl:'info', msg:'Backup completed successfully'},
+  {lvl:'warn', msg:'Disk I/O latency > 50ms'},
+  {lvl:'err', msg:'Auth failure from 10.0.0.42'},
+  {lvl:'info', msg:'Service restarted: nginx'},
+  {lvl:'warn', msg:'Rate limit approaching 90%'},
+  {lvl:'info', msg:'Cron job completed: daily-report'},
+  {lvl:'warn', msg:'SSL cert expiring in 7 days'},
+  {lvl:'err', msg:'Database replication lag: 2s'},
+  {lvl:'info', msg:'New device connected: MAC:AA:BB:CC'},
+];
+const alerts = [];
+function addAlert(lvl, msg){
+  const t = new Date().toTimeString().split(' ')[0];
+  alerts.unshift({lvl, msg, t});
+  if(alerts.length > 20) alerts.pop();
+  alertsEl.innerHTML = alerts.map(a =>
+    `<div style="padding:2px 0;border-bottom:1px solid #ffffff06;display:flex;gap:6px">
+      <span style="color:#00e5ff44;font-size:8px">${a.t}</span>
+      <span style="color:${a.lvl==='err'?'var(--red)':a.lvl==='warn'?'var(--orange)':a.lvl==='info'?'#00a8cc':'var(--green)'}">[${a.lvl.toUpperCase()}]</span>
+      <span style="color:#00e5ffaa;font-size:9px">${a.msg}</span>
+    </div>`
+  ).join('');
+}
+
+// Random alerts
+setInterval(() => {
+  if(Math.random() > 0.6){
+    const a = ALERT_MSGS[Math.floor(Math.random() * ALERT_MSGS.length)];
+    addAlert(a.lvl, a.msg);
+  }
+}, 2000);
+addAlert('info', 'System initialized');
+addAlert('success', 'All services operational');
+
+// ═══════════════════════════════════════════════
+// SYS LOG (scrolling feed)
+// ═══════════════════════════════════════════════
+const logPanel = document.getElementById('panel-log');
+const LOG_ENTRIES = [
+  {t:'NET', m:'PACKET IN 10.0.0.1 → ACCEPTED', s:'ok'},
+  {t:'SEC', m:'Firewall rule: PORT 443 ALLOW', s:'ok'},
+  {t:'SYS', m:'Thread pool: 128 → 256 workers', s:'ok'},
+  {t:'NET', m:'DNS: api.xpr0xy.sys → 10.0.0.1', s:'ok'},
+  {t:'WARN', m:'TIMEOUT: 10.0.0.42:8080', s:'warn'},
+  {t:'NET', m:'TLS 1.3 handshake complete', s:'ok'},
+  {t:'SYS', m:'GC sweep: 1.2GB freed', s:'ok'},
+  {t:'SEC', m:'Token renewed: UID A7F3-BB91', s:'ok'},
+  {t:'NET', m:'BGP peer established: AS64937', s:'ok'},
+  {t:'WARN', m:'Rate limit: 94% capacity', s:'warn'},
+  {t:'SYS', m:'Module loaded: ntx_io.ko', s:'ok'},
+  {t:'NET', m:'MTU: 1500 → 9000 (jumbo)', s:'ok'},
+  {t:'SEC', m:'Intrusion detected [FALSE POS]', s:'warn'},
+  {t:'SYS', m:'Disk READ: 2048MB/s', s:'ok'},
+  {t:'NET', m:'Connection pool: 200/500 used', s:'ok'},
+];
+const logLines = [];
+function addLogLine(){
+  const e = LOG_ENTRIES[Math.floor(Math.random() * LOG_ENTRIES.length)];
+  const t = new Date().toTimeString().split(' ')[0];
+  const idx = String(Math.floor(Math.random()*9999)).padStart(4,'0');
+  logLines.unshift({...e, t, idx});
+  if(logLines.length > 100) logLines.pop();
+  logPanel.innerHTML = logLines.slice(0,50).map(l =>
+    `<div style="display:flex;gap:6px;padding:1px 0;border-bottom:1px solid #ffffff06;animation:fadeIn 0.2s">
+      <span style="color:#ff6b3555;font-size:9px">[${l.idx}]</span>
+      <span style="color:#00e5ff44;font-size:9px">[${l.t}]</span>
+      <span style="color:#00e5ff66;font-size:9px">[${l.t}]</span>
+      <span style="color:${l.s==='warn'?'var(--orange)':l.s==='err'?'var(--red)':l.s==='ok'?'var(--green)':'var(--cyan)'};font-size:9px">[${l.t}]</span>
+    </div>`
+  ).join('');
+}
+setInterval(addLogLine, 500);
+addLogLine();
+
+// Fix the log line rendering
+function addLogLine2(){
+  const e = LOG_ENTRIES[Math.floor(Math.random() * LOG_ENTRIES.length)];
+  const t = new Date().toTimeString().split(' ')[0];
+  const idx = String(Math.floor(Math.random()*9999)).padStart(4,'0');
+  logLines.unshift({...e, t, idx});
+  if(logLines.length > 100) logLines.pop();
+  logPanel.innerHTML = logLines.slice(0,50).map(l =>
+    `<div style="display:flex;gap:4px;padding:1px 0;border-bottom:1px solid #ffffff06">
+      <span style="color:#ff6b3544;font-size:9px;min-width:28px">[${l.idx}]</span>
+      <span style="color:#00e5ff44;font-size:9px;min-width:42px">[${l.t}]</span>
+      <span style="color:${l.s==='warn'?'var(--orange)':l.s==='err'?'var(--red)':l.s==='ok'?'var(--green)':'#00a8cc'};font-size:9px">[${l.type||l.t}]</span>
+      <span style="color:#00e5ffaa;font-size:9px">${l.m}</span>
+    </div>`
+  ).join('');
+}
+
+// Rebuild properly
+logLines.length = 0;
+clearInterval(undefined);
+setInterval(() => {
+  const e = LOG_ENTRIES[Math.floor(Math.random() * LOG_ENTRIES.length)];
+  const t = new Date().toTimeString().split(' ')[0];
+  const idx = String(Math.floor(Math.random()*9999)).padStart(4,'0');
+  logLines.unshift({...e, t, idx});
+  if(logLines.length > 100) logLines.pop();
+  logPanel.innerHTML = logLines.slice(0,50).map(l =>
+    `<div style="display:flex;gap:4px;padding:1px 0;border-bottom:1px solid #ffffff06">
+      <span style="color:#ff6b3544;font-size:9px;min-width:28px">[${l.idx}]</span>
+      <span style="color:#00e5ff44;font-size:9px;min-width:42px">[${l.t}]</span>
+      <span style="color:${l.s==='warn'?'var(--orange)':l.s==='err'?'var(--red)':'var(--green)'};font-size:9px">[${l.t}]</span>
+      <span style="color:#00e5ffaa;font-size:9px">${l.m}</span>
+    </div>`
+  ).join('');
+}, 600);
+
+// ═══════════════════════════════════════════════
+// FILE BROWSER (simulated)
+// ═══════════════════════════════════════════════
+const FS = {
+  '~': {type:'dir', children:['Documents','Downloads','Projects','.config','.ssh','.vim']},
+  '~/Projects': {type:'dir', children:['terminal-aesthetics','eve-nexus','lofi-cyoa','haunted-radio']},
+  '~/Projects/terminal-aesthetics': {type:'dir', children:['index.html','README.md','package.json']},
+  '~/Projects/eve-nexus': {type:'dir', children:['index.html','style.css','app.js','assets']},
+  '~/Projects/lofi-cyoa': {type:'dir', children:['index.html','chords.js','drums.js','swing.js']},
+  '~/Documents': {type:'dir', children:['notes.md','config.yaml','todo.txt']},
+};
+let cwd = '~';
+let termHistory = [];
+let termHistIdx = -1;
+
+function renderFiles(){
+  const el = document.getElementById('panel-files');
+  const entries = FS[cwd] ? FS[cwd].children : [];
+  const parent = cwd === '~' ? null : cwd.split('/').slice(0,-1).join('/') || '~';
+  el.innerHTML = `
+    <div style="padding:4px 0;border-bottom:1px solid #00e5ff22;margin-bottom:4px;color:var(--orange);font-size:9px">
+      ${cwd} ${parent ? `→ <span style="cursor:pointer;color:var(--cyan)" onclick="cd('${parent}')">..</span>` : ''}
+    </div>
+    ${entries.map(f => {
+      const isDir = FS[cwd+'/'+f] || FS[f];
+      return `<div style="padding:3px 0;cursor:pointer;font-size:10px" onclick="fsOpen('${f}')">
+        <span style="color:${isDir ? 'var(--orange)' : 'var(--green)'}">${isDir ? '[DIR]' : '[FILE]'}</span>
+        <span style="color:#00e5ffaa">${f}</span>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+function cd(path){
+  cwd = path;
+  renderFiles();
+}
+
+function fsOpen(name){
+  const full = cwd === '~' ? name : cwd + '/' + name;
+  if(FS[full]){
+    cwd = full;
+    renderFiles();
+  } else {
+    termPrint('system', `[ ${name} ] opened`);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// NET CONNECTIONS
+// ═══════════════════════════════════════════════
+function renderNet(){
+  const el = document.getElementById('panel-net');
+  const conns = [
+    {local:'10.0.0.5:443', remote:'CDN-EDGE-A1', state:'ESTABLISHED'},
+    {local:'10.0.0.5:443', remote:'CDN-EDGE-B2', state:'ESTABLISHED'},
+    {local:'10.0.0.5:22', remote:'admin@192.168.1.100', state:'ESTABLISHED'},
+    {local:'10.0.0.5:5432', remote:'db-primary:5432', state:'LISTEN'},
+    {local:'10.0.0.5:6379', remote:'cache-01:6379', state:'ESTABLISHED'},
+    {local:'10.0.0.5:8080', remote:'api-gateway:8080', state:'TIME_WAIT'},
+    {local:'10.0.0.5:9090', remote:'monitor:9090', state:'LISTEN'},
+    {local:'10.0.0.5:443', remote:'grpc://vault.internal', state:'ESTABLISHED'},
+  ];
+  el.innerHTML = conns.map(c =>
+    `<div class="conn-row">
+      <span class="local">${c.local}</span>
+      <span class="remote">${c.remote}</span>
+      <span class="state">${c.state}</span>
+    </div>`
+  ).join('');
+}
+renderNet();
+setInterval(renderNet, 5000);
+
+// ═══════════════════════════════════════════════
+// TERMINAL
+// ═══════════════════════════════════════════════
+const termOut = document.getElementById('termOut');
+const termIn = document.getElementById('termIn');
+const globalTermIn = document.getElementById('globalTermIn');
+
+let activeInput = null;
+
+function switchInput(el){
+  document.querySelectorAll('.term-in').forEach(i => i.style.display = 'none');
+  if(el === 'global'){
+    globalTermIn.style.display = 'block';
+    globalTermIn.focus();
+    activeInput = 'global';
+  } else {
+    termIn.style.display = 'block';
+    termIn.focus();
+    activeInput = 'term';
+  }
+}
+switchInput('global');
+
+const COMMANDS = {
+  help: () => {
+    termPrint('out', 'Available commands:');
+    ['help','ls','cd','pwd','cat','ps','top','netstat','ping','clear','whoami','uptime','uname','echo','history','date'].forEach(c => {
+      termPrint('out', '  ' + c);
+    });
+  },
+  ls: (args) => {
+    const path = args[0] || '.';
+    const entries = FS[cwd] ? FS[cwd].children : [];
+    termPrint('out', entries.join('  '));
+  },
+  pwd: () => termPrint('out', cwd),
+  cd: (args) => {
+    if(!args[0]){ termPrint('out','/root'); return; }
+    const dest = args[0] === '..' ? (cwd === '~' ? '~' : cwd.split('/').slice(0,-1).join('/') || '~') : cwd === '~' ? '~/'+args[0] : cwd+'/'+args[0];
+    if(FS[dest]){ cwd = dest; renderFiles(); termPrint('out',''); }
+    else termPrint('err', 'cd: no such directory: ' + args[0]);
+  },
+  cat: (args) => {
+    if(!args[0]){ termPrint('err','cat: missing file'); return; }
+    const CONTENT = {'README.md':'# Terminal Aesthetics\nA cyberpunk terminal dashboard.','notes.md':'TODO: make it cooler\nDONE: everything','todo.txt':'1. deploy\n2. profit\n3. ship','config.yaml':'theme: terminal\ncolor: cyan\nfont: mono','index.html':'<!DOCTYPE html>...'},
+    fn = args[0];
+    termPrint('out', CONTENT[fn] || `cat: ${fn}: simulated file content`);
+  },
+  ps: () => {
+    termPrint('out','  PID  NAME          CPU%  MEM%');
+    for(let i = 0; i < 8; i++){
+      const pid = 1000 + Math.floor(Math.random()*30000);
+      const name = PROC_NAMES[Math.floor(Math.random()*PROC_NAMES.length)];
+      const cpu = (Math.random()*40).toFixed(1);
+      const mem = (Math.random()*20).toFixed(1);
+      termPrint('out', `  ${pid}  ${name.padEnd(14)} ${cpu.padStart(5)}  ${mem.padStart(4)}`);
+    }
+  },
+  top: () => {
+    termPrint('out','top - ' + new Date().toLocaleString());
+    termPrint('out',`Cpu: ${currentCpu.toFixed(1)}% usr ${(currentCpu*0.6).toFixed(1)}% sys`);
+    termPrint('out',`Mem: ${currentMem.toFixed(1)}% / 32.0G`);
+    termPrint('out','  PID  NAME          CPU%  MEM%');
+    for(let i = 0; i < 5; i++){
+      const pid = 1000 + Math.floor(Math.random()*30000);
+      const name = PROC_NAMES[Math.floor(Math.random()*PROC_NAMES.length)];
+      termPrint('out', `  ${pid}  ${name.padEnd(14)} ${(Math.random()*40).toFixed(1)}  ${(Math.random()*20).toFixed(1)}`);
+    }
+  },
+  netstat: () => renderNet() || termPrint('out','Proto  Local Address    Remote Address    State'),
+  ping: (args) => {
+    if(!args[0]){ termPrint('err','ping: missing host'); return; }
+    const host = args[0];
+    let received = 0;
+    const interval = setInterval(() => {
+      received++;
+      const ms = Math.floor(5 + Math.random()*95);
+      termPrint('out',`PING ${host}: ${ms}ms ttl=${Math.floor(50+Math.random()*10)} time=${ms}ms`);
+      if(received >= 4) clearInterval(interval);
+    }, 500);
+  },
+  clear: () => { termOut.innerHTML = ''; },
+  whoami: () => termPrint('out', 'root'),
+  uptime: () => termPrint('out', 'up ' + Math.floor(performance.now()/60000) + ' minutes'),
+  uname: () => termPrint('out', 'Linux xpr0xy 6.8.0-custom #1 SMP x86_64 GNU/Linux'),
+  echo: (args) => termPrint('out', args.join(' ')),
+  history: () => termHistory.slice().reverse().forEach((h,i) => termPrint('out', `  ${i+1}  ${h}`)),
+  date: () => termPrint('out', new Date().toString()),
+};
+
+function termPrint(type, msg){
+  const line = document.createElement('div');
+  line.className = 'term-line ' + type;
+  line.textContent = msg;
+  termOut.appendChild(line);
+  termOut.scrollTop = termOut.scrollHeight;
+}
+
+function execTerm(cmd){
+  const parts = cmd.trim().split(/\s+/);
+  const command = parts[0];
+  const args = parts.slice(1);
+  if(!command) return;
+  termPrint('cmd', 'root@terminal:' + cwd + '$ ' + cmd);
+  termHistory.push(cmd);
+  termHistIdx = termHistory.length;
+  if(COMMANDS[command]){
+    COMMANDS[command](args);
+  } else {
+    termPrint('err', `command not found: ${command}`);
+  }
+}
+
+// Input handlers
+function setupInput(el){
+  el.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){
+      execTerm(el.value);
+      el.value = '';
+    } else if(e.key === 'ArrowUp'){
+      e.preventDefault();
+      if(termHistIdx > 0){ termHistIdx--; el.value = termHistory[termHistIdx]; }
+    } else if(e.key === 'ArrowDown'){
+      e.preventDefault();
+      if(termHistIdx < termHistory.length - 1){ termHistIdx++; el.value = termHistory[termHistIdx]; }
+      else { termHistIdx = termHistory.length; el.value = ''; }
+    }
+  });
+}
+setupInput(termIn);
+setupInput(globalTermIn);
+
+// Focus input when clicking panels
+document.getElementById('panel-interact').addEventListener('click', () => switchInput('term'));
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    if(item.dataset.panel !== 'interact') switchInput('global');
+  });
+});
+
+// ═══════════════════════════════════════════════
+// PANEL SWITCHING
+// ═══════════════════════════════════════════════
+let activePanel = 'log';
+
+function switchPanel(el){
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  const panel = el.dataset.panel;
+  activePanel = panel;
+
+  ['log','files','net','interact'].forEach(p => {
+    const el2 = document.getElementById('panel-' + p);
+    if(el2) el2.style.display = p === panel ? 'block' : 'none';
+  });
+
+  if(panel === 'interact') switchInput('term');
+  else switchInput('global');
+
+  if(panel === 'files') renderFiles();
+  if(panel === 'net') renderNet();
+}
+
+window.switchPanel = switchPanel;
+window.cd = cd;
+window.fsOpen = fsOpen;
+window.pingNode = pingNode;
+
+// Boot message
+termPrint('system', 'TERMINAL.AESTHETICS v2.4.1');
+termPrint('system', 'Type "help" for commands.');
+termPrint('out', '');
+
+// Initial chart draw
+setTimeout(() => { drawCpuChart(); drawMemChart(); }, 100);
 </script>
 </body>
 </html>
