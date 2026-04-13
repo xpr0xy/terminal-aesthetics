@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TERMINAL.AESTHETICS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0a0f;color:#00e5ff;font-family:'Share Tech Mono','Courier New',monospace;overflow:hidden;height:100vh;width:100vw;position:relative;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,0.03) 2px,rgba(0,229,255,0.03) 4px);pointer-events:none;z-index:1000;}
+body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.7) 100%);pointer-events:none;z-index:999;}
+.screen{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr auto;height:100vh;padding:20px;gap:16px;}
+.header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;border:1px solid #00e5ff33;padding:8px 16px;font-size:11px;color:#00e5ff88;}
+.header .title{color:#ff6b35;font-size:13px;letter-spacing:4px;}
+.col{display:flex;flex-direction:column;gap:12px;}
+.panel{border:1px solid #00e5ff44;padding:12px;position:relative;flex:1;min-height:0;overflow:hidden;}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00e5ff,transparent);opacity:0.5;}
+.panel-label{position:absolute;top:-10px;left:12px;background:#0a0a0f;padding:0 6px;font-size:9px;color:#ff6b35;letter-spacing:3px;}
+.panel-content{font-size:10px;line-height:1.4;color:#00e5ffaa;overflow:hidden;}
+.radar-container{display:flex;justify-content:center;align-items:center;height:100%;}
+canvas#radar{border-radius:50%;}
+.hex-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;font-size:8px;color:#00e5ff55;}
+.hex-cell{padding:2px;text-align:center;}
+.hex-cell.hot{color:#ff6b35cc;}
+.lissajous-container{display:flex;justify-content:center;align-items:center;height:100%;}
+canvas#lissajous{border-radius:50%;}
+.data-log{height:100%;overflow:hidden;}
+.log-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.log-line .idx{color:#ff6b3588;}
+.log-line .type{color:#00e5ff88;}
+.log-line .msg{color:#00e5ffcc;}
+.log-line .warn{color:#ff6b35;}
+.log-line .ok{color:#00ff88;}
+.cursor{display:inline-block;width:8px;height:12px;background:#00e5ff;animation:blink 1s step-end infinite;vertical-align:middle;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+.phase-meter{display:flex;align-items:center;gap:8px;padding:4px 0;}
+.phase-bar{flex:1;height:4px;background:#00e5ff11;position:relative;overflow:hidden;}
+.phase-fill{height:100%;background:linear-gradient(90deg,#00e5ff,#ff6b35);animation:phaseSlide 2s linear infinite;}
+@keyframes phaseSlide{0%{width:0%;}50%{width:100%;}100%{width:0%;}}
+.network-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:8px;}
+.node{padding:4px;border:1px solid #00e5ff22;text-align:center;color:#00e5ff66;animation:nodePulse 2s ease-in-out infinite;}
+.node:nth-child(odd){animation-delay:-1s;}
+.node.online{border-color:#00ff8844;color:#00ff88aa;}
+.node.warn{border-color:#ff6b3544;color:#ff6b35aa;}
+@keyframes nodePulse{0%,100%{opacity:0.6;}50%{opacity:1;}}
+.progress-row{display:flex;align-items:center;gap:8px;font-size:9px;color:#00e5ff88;}
+.progress-bar{flex:1;height:2px;background:#00e5ff22;}
+.progress-fill{height:100%;background:#00e5ff;animation:progressAnim 3s ease-in-out infinite;}
+@keyframes progressAnim{0%{width:10%;}50%{width:90%;}100%{width:10%;}}
+.footer{grid-column:1/-1;display:flex;justify-content:space-between;font-size:9px;color:#00e5ff44;border:1px solid #00e5ff22;padding:6px 16px;}
+#bgCanvas{position:fixed;inset:0;z-index:-1;}
+.glitch{animation:glitch 3s infinite;}
+@keyframes glitch{0%,95%,100%{transform:none;filter:none;}96%{transform:skewX(2deg);filter:hue-rotate(90deg);}97%{transform:skewX(-1deg);}98%{transform:skewX(1deg);filter:hue-rotate(-90deg);}99%{transform:none;filter:hue-rotate(45deg);}}
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<div class="screen glitch">
+  <div class="header">
+    <span class="title">▓▓▓ TERMINAL.AESTHETICS v2.4.1 ▓▓▓</span>
+    <span>SYS:ONLINE | NET:ACTIVE | UPTIME: <span id="uptime">000:00:00</span></span>
+    <span id="clock">00:00:00</span>
+  </div>
+  <div class="col">
+    <div class="panel"><span class="panel-label">RADAR.SCAN</span><div class="radar-container"><canvas id="radar" width="160" height="160"></canvas></div></div>
+    <div class="panel"><span class="panel-label">HEX.DUMP</span><div class="panel-content"><div class="hex-grid" id="hexGrid"></div></div></div>
+    <div class="panel"><span class="panel-label">NET.STATUS</span><div class="panel-content"><div class="network-grid" id="networkGrid"></div><div style="margin-top:8px;"><div class="progress-row"><span>BANDWIDTH</span><div class="progress-bar"><div class="progress-fill"></div></div></div><div class="progress-row" style="margin-top:4px;"><span>LATENCY</span><div class="progress-bar"><div class="progress-fill" style="animation-delay:-1s;animation-duration:2s;"></div></div></div></div></div></div>
+  </div>
+  <div class="col">
+    <div class="panel"><span class="panel-label">LISSAJOUS.FIGURE</span><div class="lissajous-container"><canvas id="lissajous" width="160" height="160"></canvas></div></div>
+    <div class="panel"><span class="panel-label">PHASE.MATRIX</span><div class="panel-content"><div class="phase-meter"><span style="width:50px;">PHASE</span><div class="phase-bar"><div class="phase-fill"></div></div></div><div class="phase-meter" style="margin-top:6px;"><span style="width:50px;">AMP</span><div class="phase-bar"><div class="phase-fill" style="animation-delay:-0.5s;"></div></div></div><div class="phase-meter" style="margin-top:6px;"><span style="width:50px;">FREQ</span><div class="phase-bar"><div class="phase-fill" style="animation-delay:-1s;animation-duration:1.5s;"></div></div></div><div style="margin-top:8px;font-size:9px;"><div>CARRIER: <span id="carrierFreq" style="color:#ff6b35;">14.400 MHz</span></div><div>MOD: <span style="color:#00e5ff88;">FM</span></div><div>SNR: <span id="snrVal" style="color:#00ff88;">+42.7 dB</span></div></div></div></div>
+    <div class="panel"><span class="panel-label">SYS.LOG</span><div class="panel-content"><div class="data-log" id="dataLog"></div></div></div>
+  </div>
+  <div class="footer">
+    <span>MEM: <span id="memUse">0.0</span> GB / 32.0 GB</span>
+    <span>CPU: <span id="cpuUse">0</span>% | <span>16</span>C</span>
+    <span>NET: <span id="netStat" style="color:#00ff88;">ESTABLISHED</span></span>
+    <span>SEC: <span style="color:#00ff88;">LEVEL 5</span></span>
+    <span id="cursorPos">0000:0000<span class="cursor"></span></span>
+  </div>
+</div>
+<script>
+const bgCanvas=document.getElementById('bgCanvas'),bgCtx=bgCanvas.getContext('2d');
+function resizeBg(){bgCanvas.width=window.innerWidth;bgCanvas.height=window.innerHeight;}
+resizeBg();window.addEventListener('resize',resizeBg);
+const CHARS='0123456789ABCDEF:;/.<>[]{}|~^';
+const drops=Array.from({length:Math.floor(window.innerWidth/14)},()=>Math.random()*-100);
+function drawBg(){
+  bgCtx.fillStyle='rgba(10,10,15,0.15)';
+  bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
+  bgCtx.font='12px Share Tech Mono,monospace';
+  for(let i=0;i<drops.length;i++){
+    const char=CHARS[Math.floor(Math.random()*CHARS.length)];
+    const x=i*14,y=drops[i]*14;
+    bgCtx.fillStyle=`rgba(0,229,255,${Math.random()*0.4+0.1})`;
+    bgCtx.fillText(char,x,y);
+    if(y>bgCanvas.height&&Math.random()>0.975)drops[i]=0;
+    drops[i]++;
+  }
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+function updateClock(){
+  const now=new Date();
+  document.getElementById('clock').textContent=now.toTimeString().split(' ')[0];
+  document.getElementById('cursorPos').innerHTML=String(Math.floor(Math.random()*9999)).padStart(4,'0')+':'+String(Math.floor(Math.random()*9999)).padStart(4,'0')+'<span class="cursor"></span>';
+  document.getElementById('memUse').textContent=(8+Math.random()*4).toFixed(1);
+  document.getElementById('cpuUse').textContent=Math.floor(Math.random()*60+10);
+  document.getElementById('snrVal').textContent='+'+(40+Math.random()*5).toFixed(1)+' dB';
+  document.getElementById('carrierFreq').textContent=(14.0+Math.random()*0.8).toFixed(3)+' MHz';
+}
+setInterval(updateClock,1000);updateClock();
+const radarCanvas=document.getElementById('radar'),radarCtx=radarCanvas.getContext('2d'),radarRadius=70;
+let radarAngle=0;
+const radarBlips=Array.from({length:6},()=>({angle:Math.random()*Math.PI*2,dist:Math.random()*radarRadius,speed:(Math.random()-0.5)*0.02}));
+function drawRadar(){
+  radarCtx.clearRect(0,0,160,160);
+  const cx=80,cy=80;
+  radarCtx.strokeStyle='#00e5ff22';radarCtx.lineWidth=1;
+  for(let r=20;r<=radarRadius;r+=20){radarCtx.beginPath();radarCtx.arc(cx,cy,r,0,Math.PI*2);radarCtx.stroke();}
+  for(let a=0;a<Math.PI*2;a+=Math.PI/4){radarCtx.beginPath();radarCtx.moveTo(cx,cy);radarCtx.lineTo(cx+Math.cos(a)*radarRadius,cy+Math.sin(a)*radarRadius);radarCtx.stroke();}
+  radarCtx.strokeStyle='#00e5ff';radarCtx.lineWidth=2;radarCtx.beginPath();radarCtx.moveTo(cx,cy);radarCtx.lineTo(cx+Math.cos(radarAngle)*radarRadius,cy+Math.sin(radarAngle)*radarRadius);radarCtx.stroke();
+  for(let i=0;i<20;i++){const a=radarAngle-i*0.04,alpha=(1-i/20)*0.3;radarCtx.strokeStyle=`rgba(0,229,255,${alpha})`;radarCtx.beginPath();radarCtx.moveTo(cx,cy);radarCtx.lineTo(cx+Math.cos(a)*radarRadius,cy+Math.sin(a)*radarRadius);radarCtx.stroke();}
+  radarBlips.forEach(blip=>{blip.angle+=blip.speed;const bx=cx+Math.cos(blip.angle)*blip.dist,by=cy+Math.sin(blip.angle)*blip.dist,age=(radarAngle-blip.angle+Math.PI*2)%(Math.PI*2),alpha=Math.max(0,1-age/(Math.PI*2));if(alpha>0){radarCtx.fillStyle=`rgba(255,107,53,${alpha})`;radarCtx.beginPath();radarCtx.arc(bx,by,3,0,Math.PI*2);radarCtx.fill();}});
+  radarAngle+=0.03;requestAnimationFrame(drawRadar);
+}
+drawRadar();
+const hexGrid=document.getElementById('hexGrid');
+function buildHexGrid(){hexGrid.innerHTML='';for(let i=0;i<64;i++){const cell=document.createElement('div');cell.className='hex-cell'+(Math.random()>0.85?' hot':'');cell.textContent=Math.floor(Math.random()*256).toString(16).toUpperCase().padStart(2,'0');hexGrid.appendChild(cell);}}
+buildHexGrid();
+setInterval(()=>{hexGrid.querySelectorAll('.hex-cell').forEach(c=>{if(Math.random()>0.7){c.textContent=Math.floor(Math.random()*256).toString(16).toUpperCase().padStart(2,'0');c.className='hex-cell'+(Math.random()>0.85?' hot':'');}});},200);
+const lissCanvas=document.getElementById('lissajous'),lissCtx=lissCanvas.getContext('2d');let lissT=0;
+function drawLissajous(){lissCtx.clearRect(0,0,160,160);const cx=80,cy=80,rx=65,ry=65;lissCtx.strokeStyle='#00e5ff22';lissCtx.lineWidth=1;lissCtx.beginPath();lissCtx.arc(cx,cy,rx,0,Math.PI*2);lissCtx.stroke();lissCtx.strokeStyle='#ff6b3566';lissCtx.lineWidth=1.5;lissCtx.beginPath();for(let i=0;i<=300;i++){const t=(i/300)*Math.PI*2,x=cx+rx*Math.sin(3*t+lissT),y=cy+ry*Math.sin(4*t);if(i===0)lissCtx.moveTo(x,y);else lissCtx.lineTo(x,y);}lissCtx.stroke();lissT+=0.008;requestAnimationFrame(drawLissajous);}
+drawLissajous();
+const dataLog=document.getElementById('dataLog');
+const LOG_MSGS=[{t:'NET',m:'PACKET IN 192.168.1.104 → ACCEPTED',s:'ok'},{t:'SEC',m:'FIREWALL RULE ADDED: PORT 443 ALLOW',s:'ok'},{t:'SYS',m:'THREAD POOL RESIZED: 128 → 256',s:'ok'},{t:'NET',m:'DNS LOOKUP: api.nexus.sys → 10.0.0.1',s:'ok'},{t:'WARN',m:'CONN TIMEOUT: 10.0.0.42:8080',s:'warn'},{t:'NET',m:'SSL HANDSHAKE COMPLETE: TLS 1.3',s:'ok'},{t:'SYS',m:'GC SWEEP COMPLETE: 1.2GB FREED',s:'ok'},{t:'SEC',m:'AUTH TOKEN RENEWED: UID A7F3',s:'ok'},{t:'NET',m:'ROUTE UPDATE: HOPS 12 → 14',s:'ok'},{t:'WARN',m:'RATE LIMIT APPROACHING: 98%',s:'warn'},{t:'SYS',m:'KERNEL MODULE LOADED: ntx_io',s:'ok'},{t:'NET',m:'BGP PEER ESTABLISHED: AS64937',s:'ok'},{t:'SEC',m:'INTRUSION DETECTED [FALSE POS]',s:'warn'},{t:'SYS',m:'DISK IO: 2048MB/s READ',s:'ok'},{t:'NET',m:'MTU NEGOTIATION: 1500 → 9000',s:'ok'}];
+function addLogLine(){const entry=LOG_MSGS[Math.floor(Math.random()*LOG_MSGS.length)];const line=document.createElement('div');line.className='log-line';const idx=String(Math.floor(Math.random()*9999)).padStart(4,'0');line.innerHTML='<span class="idx">['+idx+']</span> <span class="type">['+entry.t+']</span> <span class="msg '+entry.s+'">'+entry.m+'</span>';dataLog.insertBefore(line,dataLog.firstChild);while(dataLog.children.length>8)dataLog.removeChild(dataLog.lastChild);}
+addLogLine();setInterval(addLogLine,600);
+const networkGrid=document.getElementById('networkGrid');
+const NODES=['NODE-A1','NODE-B2','NODE-C3','NODE-D4','NODE-E5','NODE-F6','NODE-G7','NODE-H8'];
+NODES.forEach(name=>{const node=document.createElement('div');node.className='node '+['online','online','online','warn'][Math.floor(Math.random()*4)];node.textContent=name;networkGrid.appendChild(node);});
+setInterval(()=>{networkGrid.querySelectorAll('.node').forEach(n=>{n.className='node '+['online','online','warn'][Math.floor(Math.random()*3)];});},2000);
+</script>
+</body>
+</html>
